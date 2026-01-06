@@ -6,11 +6,23 @@
 
 ```
 .
-├── requirements.txt      # 项目依赖
-├── database.py          # 数据库配置和模型定义
-├── schemas.py           # Pydantic 数据验证模型
-├── main.py              # FastAPI 应用和路由
-└── test.db              # SQLite 数据库文件（自动创建）
+├── common/                # 公共模块
+│   ├── router.py          # 路由配置
+│   └── vo.py              # 视图对象（响应模型）
+├── control/               # 控制器层
+│   ├── user_controller.py # 用户控制器
+│   └── address_controller.py # 地址控制器
+├── service/               # 服务层
+│   ├── user_service.py    # 用户服务
+│   └── address_service.py # 地址服务
+├── dto/                   # 数据传输对象
+│   └── schemas.py         # Pydantic 数据验证模型
+├── entity/                # 实体层
+│   ├── database.py        # 数据库配置
+│   └── models.py          # ORM 模型定义
+├── requirements.txt       # 项目依赖
+├── app.py                 # FastAPI 应用入口
+└── README.md              # 项目说明
 ```
 
 ## 快速开始
@@ -24,13 +36,13 @@ pip install -r requirements.txt
 ### 2. 运行应用
 
 ```bash
-python main.py
+python app.py
 ```
 
 或者使用 uvicorn 直接运行：
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.py:app --reload
 ```
 
 应用将在 `http://localhost:8000` 启动。
@@ -82,10 +94,34 @@ uvicorn main:app --reload
 
 | 方法 | 端点 | 说明 |
 |------|------|------|
-| POST | `/users/{user_id}/addresses/` | 创建地址 |
-| GET | `/users/{user_id}/addresses/` | 获取用户的所有地址 |
+| POST | `/addresses/users/{user_id}` | 为用户创建地址 |
+| GET | `/addresses/users/{user_id}` | 获取用户的所有地址 |
 | GET | `/addresses/{address_id}` | 获取指定地址 |
 | DELETE | `/addresses/{address_id}` | 删除地址 |
+
+## 响应格式
+
+所有接口返回统一的响应格式，基于 `common/vo.py` 中定义的响应模型：
+
+### DataResponseModel
+```json
+{
+  "code": 200,
+  "msg": "操作成功",
+  "success": true,
+  "time": "2023-01-01T00:00:00",
+  "data": {}
+}
+```
+
+### CrudResponseModel
+```json
+{
+  "is_success": true,
+  "message": "操作成功",
+  "result": {}
+}
+```
 
 ## 使用示例
 
@@ -106,7 +142,7 @@ curl "http://localhost:8000/users/"
 ### 为用户添加地址
 
 ```bash
-curl -X POST "http://localhost:8000/users/1/addresses/" \
+curl -X POST "http://localhost:8000/addresses/users/1" \
   -H "Content-Type: application/json" \
   -d '{"email_address": "spongebob@example.com"}'
 ```
@@ -118,6 +154,54 @@ curl -X POST "http://localhost:8000/users/1/addresses/" \
 - **Pydantic** - 数据验证库
 - **SQLite** - 轻量级数据库（开发环境）
 - **Uvicorn** - ASGI 服务器
+
+## 架构点评
+
+### 优势
+
+1. **清晰的分层架构**
+   - Controller层：处理HTTP请求和响应
+   - Service层：封装业务逻辑
+   - Entity层：数据模型定义
+   - DTO层：数据传输对象
+   - Common层：公共工具和响应模型
+
+2. **可维护性**
+   - 业务逻辑与HTTP层分离，便于维护
+   - 代码职责清晰，易于定位问题
+
+3. **可测试性**
+   - Service层可以独立测试
+   - 业务逻辑不受HTTP层影响
+
+4. **统一响应格式**
+   - 所有接口返回一致的响应结构
+   - 提高前端处理响应的一致性
+
+5. **遵循SOLID原则**
+   - 单一职责原则：每层只负责特定功能
+   - 开闭原则：易于扩展新功能
+
+6. **AI辅助开发友好**
+   - 分层架构便于AI模型精确定位修改位置
+   - 每层职责明确，减少AI理解代码的复杂度
+   - 模式化CRUD操作便于AI识别和应用修改
+
+### 不足
+
+1. **复杂度增加**
+   - 对于简单CRUD应用可能存在过度设计
+   - 需要维护更多的文件和类
+
+2. **学习成本**
+   - 新团队成员需要理解分层架构
+   - 增加了代码导航的复杂性
+
+3. **性能开销**
+   - 多层调用可能带来微小性能开销
+
+4. **代码冗余**
+   - 相似的CRUD操作在不同层重复实现
 
 ## 学习资源
 
