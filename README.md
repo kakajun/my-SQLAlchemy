@@ -40,7 +40,7 @@ uv pip install -r requirements.txt
 
 
 ```bash
-uv run uvicorn app:app --reload
+uvicorn app:app --reload
 ```
 
 应用将在 `http://localhost:8000` 启动。

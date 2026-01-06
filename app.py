@@ -1,30 +1,12 @@
-from fastapi import FastAPI, Request
-
+from fastapi import FastAPI
+from utils.log_util import logger
 from entity.database import create_tables
-from common.router import APIRouterPro, auto_register_routers
+from common.router import auto_register_routers
+from exceptions.handle import handle_exception
+from middlewares.handle import handle_middleware
 
 # 创建FastAPI应用
 app = FastAPI(title="SQLAlchemy FastAPI Demo - 模块化架构")
-
-
-# 全局异常处理器 - 处理 Pydantic 验证错误
-@app.exception_handler(Exception)
-async def validation_exception_handler(request: Request, exc: Exception):
-    from pydantic import ValidationError
-    if isinstance(exc, ValidationError):
-        return {
-            "status_code": 422,
-            "detail": "输入数据验证失败",
-            "errors": [
-                {
-                    "loc": error["loc"],
-                    "msg": error["msg"],
-                    "type": error["type"]
-                }
-                for error in exc.errors()
-            ]
-        }
-    return {"status_code": 500, "detail": "服务器内部错误"}
 
 
 # 启动事件 - 创建数据库表
@@ -32,12 +14,15 @@ async def validation_exception_handler(request: Request, exc: Exception):
 def startup_event():
     create_tables()
     print("✅ 数据库表已创建")
+    print("🚀 http://127.0.0.1:8000/docs 开始启动")
 
 
-# 使用自动路由注册功能
+# 统一异常处理
+handle_exception(app)
 # 自动注册所有路由
 auto_register_routers(app)
-
+# 加载中间件处理方法
+handle_middleware(app)
 
 # ============ 根路由 ============
 

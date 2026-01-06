@@ -1,8 +1,6 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
-
 from entity.database import get_session
-from entity.models import User as UserModel
 from dto.schemas import User, UserCreate
 from common.router import APIRouterPro
 from common.vo import DataResponseModel, CrudResponseModel
