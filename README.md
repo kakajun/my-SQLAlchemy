@@ -29,20 +29,18 @@
 
 ### 1. 安装依赖
 
+
 ```bash
-pip install -r requirements.txt
+uv venv --python=3.12 .venv
+.venv\Scripts\activate
+uv pip install -r requirements.txt
 ```
 
 ### 2. 运行应用
 
-```bash
-python app.py
-```
-
-或者使用 uvicorn 直接运行：
 
 ```bash
-uvicorn app.py:app --reload
+uv run uvicorn app:app --reload
 ```
 
 应用将在 `http://localhost:8000` 启动。

@@ -47,9 +47,12 @@ class APIRouterPro(APIRouter):
     def __init__(  # noqa: PLR0913
         self,
         *,
-        prefix: Annotated[str, Doc('An optional path prefix for the router.')] = '',
-        order_num: Annotated[int, Doc('An optional order number for the router.')] = 100,
-        auto_register: Annotated[bool, Doc('An optional auto register flag for the router.')] = True,
+        prefix: Annotated[str, Doc(
+            'An optional path prefix for the router.')] = '',
+        order_num: Annotated[int, Doc(
+            'An optional order number for the router.')] = 100,
+        auto_register: Annotated[bool, Doc(
+            'An optional auto register flag for the router.')] = True,
         tags: Annotated[
             Optional[list[Union[str, Enum]]],
             Doc(
@@ -297,21 +300,22 @@ class RouterRegister:
         """
         self.app = app
         # 获取项目根目录
-        self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        self.project_root = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..'))
         sys.path.insert(0, self.project_root)
 
     def _find_controller_files(self) -> list[str]:
         """
-        查找所有controller目录下的py文件
+        查找所有control目录下的py文件
 
         :return: py文件路径列表
         """
         controller_files = []
-        # 遍历所有目录，查找controller目录
+        # 遍历所有目录，查找control目录
         for root, _dirs, files in os.walk(self.project_root):
-            # 检查当前目录是否为controller目录
-            if os.path.basename(root) == 'controller':
-                # 遍历controller目录下的所有py文件
+            # 检查当前目录是否为control目录
+            if os.path.basename(root) == 'control':
+                # 遍历control目录下的所有py文件
                 for file in files:
                     if file.endswith('.py') and not file.startswith('__'):
                         file_path = os.path.join(root, file)
