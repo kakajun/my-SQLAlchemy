@@ -5,13 +5,7 @@ import time
 from loguru import logger as _logger
 from loguru._logger import Logger
 
-# from middlewares.trace_middleware import TraceCtx
-
-
-class TraceCtx:
-    @staticmethod
-    def get_id():
-        return "0"
+from middlewares.trace_middleware import TraceCtx
 
 
 class LoggerInitializer:
