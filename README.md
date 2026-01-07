@@ -6,23 +6,38 @@
 
 ```
 .
-├── common/                # 公共模块
-│   ├── router.py          # 路由配置
-│   └── vo.py              # 视图对象（响应模型）
-├── control/               # 控制器层
-│   ├── user_controller.py # 用户控制器
-│   └── address_controller.py # 地址控制器
-├── service/               # 服务层
-│   ├── user_service.py    # 用户服务
-│   └── address_service.py # 地址服务
-├── dto/                   # 数据传输对象
-│   └── schemas.py         # Pydantic 数据验证模型
-├── entity/                # 实体层
-│   ├── database.py        # 数据库配置
-│   └── models.py          # ORM 模型定义
-├── requirements.txt       # 项目依赖
-├── app.py                 # FastAPI 应用入口
-└── README.md              # 项目说明
+├── common/                    # 公共模块
+│   ├── constant.py            # 常量定义（HTTP状态码等）
+│   ├── router.py              # 路由配置
+│   └── vo.py                  # 视图对象（响应模型）
+├── control/                   # 控制器层
+│   ├── user_controller.py     # 用户控制器
+│   └── address_controller.py  # 地址控制器
+├── dto/                       # 数据传输对象
+│   └── schemas.py             # Pydantic 数据验证模型
+├── entity/                    # 实体层
+│   ├── database.py            # 数据库配置
+│   └── models.py              # ORM 模型定义
+├── exceptions/                # 异常处理模块
+│   ├── exception.py           # 自定义异常类
+│   └── handle.py              # 全局异常处理器
+├── middlewares/               # 中间件模块
+│   ├── trace_middleware/      # 链路追踪中间件
+│   │   ├── ctx.py             # 链路追踪上下文
+│   │   ├── middle.py          # 链路追踪中间件实现
+│   │   └── span.py            # 链路跨度定义
+│   ├── cors_middleware.py     # CORS中间件
+│   ├── gzip_middleware.py     # GZIP压缩中间件
+│   └── handle.py              # 中间件注册处理
+├── service/                   # 服务层
+│   ├── user_service.py        # 用户服务
+│   └── address_service.py     # 地址服务
+├── utils/                     # 工具模块
+│   ├── log_util.py            # 日志工具（Loguru配置）
+│   └── response_util.py       # 响应工具类
+├── requirements.txt           # 项目依赖
+├── app.py                     # FastAPI 应用入口
+└── README.md                  # 项目说明
 ```
 
 ## 快速开始
@@ -153,16 +168,38 @@ curl -X POST "http://localhost:8000/addresses/users/1" \
 - **SQLite** - 轻量级数据库（开发环境）
 - **Uvicorn** - ASGI 服务器
 
+## 系统架构
+
+### 分层设计
+
+```
+请求 → 中间件层 → 控制器层 → 服务层 → 数据访问层 → 数据库
+       ↓
+    异常处理（统一响应格式）
+```
+
+**各层职责：**
+- **Middlewares**：请求前处理（CORS、GZIP、链路追踪）
+- **Controllers**：HTTP请求解析和响应
+- **Services**：业务逻辑实现
+- **Entity**：数据模型和数据库操作
+- **DTO**：数据验证（Pydantic）
+- **Exceptions**：统一异常处理和响应格式转换
+- **Utils**：日志、响应等通用工具
+- **Common**：常量、路由管理、响应模型
+
 ## 架构点评
 
 ### 优势
 
 1. **清晰的分层架构**
+   - Middleware层：请求前处理
    - Controller层：处理HTTP请求和响应
    - Service层：封装业务逻辑
    - Entity层：数据模型定义
-   - DTO层：数据传输对象
-   - Common层：公共工具和响应模型
+   - DTO层：数据传输对象验证
+   - Exception层：统一异常处理
+   - Utils层：日志和工具支持
 
 2. **可维护性**
    - 业务逻辑与HTTP层分离，便于维护
@@ -172,8 +209,10 @@ curl -X POST "http://localhost:8000/addresses/users/1" \
    - Service层可以独立测试
    - 业务逻辑不受HTTP层影响
 
-4. **统一响应格式**
+4. **统一异常处理与响应格式**
    - 所有接口返回一致的响应结构
+   - Pydantic验证错误被拦截转换为统一格式
+   - 自定义异常统一处理
    - 提高前端处理响应的一致性
 
 5. **遵循SOLID原则**
@@ -184,6 +223,16 @@ curl -X POST "http://localhost:8000/addresses/users/1" \
    - 分层架构便于AI模型精确定位修改位置
    - 每层职责明确，减少AI理解代码的复杂度
    - 模式化CRUD操作便于AI识别和应用修改
+
+7. **完整的中间件支持**
+   - CORS跨域配置
+   - GZIP响应压缩
+   - 链路追踪（分布式追踪）
+
+8. **专业的日志与监控**
+   - Loguru日志框架
+   - 自动错误追踪
+   - 链路追踪支持
 
 ### 不足
 
