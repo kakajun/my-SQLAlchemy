@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import HTTPException, RequestValidationError
 from pydantic_validation_decorator import FieldValidationError
-from pydantic import ValidationError
 
 from exceptions.exception import (
     AuthException,

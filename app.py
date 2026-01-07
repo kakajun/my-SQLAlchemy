@@ -5,17 +5,21 @@ from common.router import auto_register_routers
 from exceptions.handle import handle_exception
 from middlewares.handle import handle_middleware
 
-# 创建FastAPI应用
-app = FastAPI(title="SQLAlchemy FastAPI Demo - 模块化架构")
 
-
-# 启动事件 - 创建数据库表
-@app.on_event("startup")
-def startup_event():
-    create_tables()
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    logger.info(f'⏰️ FastAPI Demo开始启动')
+    await create_tables()
     print("✅ 数据库表已创建")
     print("🚀 http://127.0.0.1:8000/docs 开始启动")
+    yield
 
+# 创建FastAPI应用
+app = FastAPI(
+    title="SQLAlchemy FastAPI Demo - 模块化架构",
+    description="一个基于SQLAlchemy的FastAPI示例项目，使用模块化架构进行开发。",
+    version="0.0.1",
+    lifespan=lifespan,
+)
 
 # 统一异常处理
 handle_exception(app)
@@ -25,6 +29,7 @@ auto_register_routers(app)
 handle_middleware(app)
 
 # ============ 根路由 ============
+
 
 @app.get("/")
 def root():

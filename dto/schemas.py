@@ -1,12 +1,10 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field, validator
-import re
-
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 class AddressBase(BaseModel):
     email_address: EmailStr = Field(..., description="电子邮件地址")
 
-    @validator('email_address')
+    @field_validator('email_address')
     def validate_email_format(cls, v):
         if '@' not in v:
             raise ValueError('无效的邮箱格式')
@@ -34,7 +32,7 @@ class UserBase(BaseModel):
     fullname: Optional[str] = Field(
         None, min_length=2, max_length=50, description="全名，可选")
 
-    @validator('name')
+    @field_validator('name')
     def validate_name(cls, v):
         if not v.isalnum():
             raise ValueError('用户名只能包含字母和数字')
@@ -42,7 +40,7 @@ class UserBase(BaseModel):
             raise ValueError('用户名长度至少为2个字符')
         return v.lower()
 
-    @validator('fullname')
+    @field_validator('fullname')
     def validate_fullname(cls, v):
         if v is not None and len(v.strip()) < 2:
             raise ValueError('全名长度至少为2个字符')
