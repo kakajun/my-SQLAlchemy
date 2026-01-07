@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-
+from datetime import datetime
 from entity.models import User as UserModel
 from dto.schemas import User, UserCreate
 from common.vo import DataResponseModel, CrudResponseModel
@@ -53,6 +53,7 @@ class UserService:
             # 使用 Pydantic 验证后的数据
             db_user.name = user.name
             db_user.fullname = user.fullname
+            db_user.update_time = datetime.now()
             session.commit()
             session.refresh(db_user)
             return DataResponseModel[User](data=db_user)

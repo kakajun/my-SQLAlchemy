@@ -1,6 +1,8 @@
 from typing import List, Optional
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from datetime import datetime
+
 
 class Base(DeclarativeBase):
     pass
@@ -16,9 +18,14 @@ class User(Base):
     addresses: Mapped[List["Address"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    create_time: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, default=datetime.now, comment='创建时间')
+
+    update_time: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment='更新时间')
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+        return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r} , create_time={self.create_time!r}, update_time={self.update_time!r})"
 
 
 class Address(Base):

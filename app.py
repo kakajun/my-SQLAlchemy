@@ -1,16 +1,15 @@
 from fastapi import FastAPI
-from utils.log_util import logger
 from entity.database import create_tables
 from common.router import auto_register_routers
 from exceptions.handle import handle_exception
 from middlewares.handle import handle_middleware
 
 
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info(f'⏰️ FastAPI Demo开始启动')
-    await create_tables()
+async def lifespan(app: FastAPI):
+    print(f'⏰️ FastAPI Demo开始启动')
+    create_tables()
     print("✅ 数据库表已创建")
-    print("🚀 http://127.0.0.1:8000/docs 开始启动")
+    print('\033[92m' + '🚀 http://127.0.0.1:8000/docs 已启动' + '\033[0m')
     yield
 
 # 创建FastAPI应用
